@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ophthalmology Post-Op Drop Chart App</title>
   
-  <!-- 💾 SECTION 1: SYSTEM LIBRARIES & SYSTEM STYLESHEETS -->
-  <!-- [We will paste Section 1 here] -->
-
-  <!-- ============================================================================== -->
-  <!-- 🏥 SECTION 1: SYSTEM LIBRARIES & TYPOGRAPHY STYLESHEET                         -->
-  <!-- ============================================================================== -->
+  <!-- 💾 SYSTEM LIBRARIES FOR LOCAL PRINT EXPORTS -->
   <script src="https://cloudflare.com"></script>
   <script src="https://cloudflare.com"></script>
 
@@ -24,6 +19,7 @@
       --stop: #e53e3e; 
     }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 30px; margin: 0; }
+    
     .master-wrapper { max-width: 950px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
     .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
     h2 { margin-top: 0; color: var(--primary); font-size: 16px; border-bottom: 2px solid #edf2f7; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -38,96 +34,224 @@
     .btn-blue { background-color: #3b82f6 !important; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2); }
     .btn-blue:hover { background-color: #2563eb !important; }
 
-    /* Enforces exact Letter Landscape aspect ratio display container bounds down-stacked */
-    .pdf-canvas-wrapper { width: 100%; overflow-x: auto; background: #e2e8f0; padding: 30px 0; display: flex; justify-content: center; border-radius: 12px; border: 1px dashed #cbd5e1; }
-    .sheet-body { background: white; width: 792pt; min-width: 792pt; height: auto; min-height: 612pt; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); padding: 40px; box-sizing: border-box; color: black; position: relative; margin: 0 auto; }
+    /* 🔍 FIXED PRINT SANDBOX FRAME: Locks layout sheet to an 11x8.5 aspect ratio */
+    .pdf-canvas-wrapper { width: 100%; overflow-x: auto; background: #cbd5e1; padding: 40px 0; display: flex; justify-content: center; border-radius: 12px; border: 1px solid #94a3b8; }
+    .sheet-body { background: white; width: 792pt; min-width: 792pt; max-width: 792pt; height: 612pt; min-height: 612pt; max-height: 612pt; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); padding: 45px; box-sizing: border-box; color: black; position: relative; margin: 0 auto; overflow: hidden; }
     
     .sheet-title { font-size: 20px; font-weight: bold; color: black; margin: 0 0 5px 0; text-align: left; }
     .sheet-meta { font-size: 13px; color: #2d3748; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
-    .week-block { margin-bottom: 25px; page-break-inside: avoid; }
+    .week-block { margin-bottom: 20px; page-break-inside: avoid; }
     .week-header { font-size: 14px; font-weight: bold; color: var(--primary); margin-bottom: 8px; }
-    .grid-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
-    .grid-table th { background: #e2e8f0; color: black; font-weight: bold; font-size: 11px; padding: 10px 4px; text-align: center; border: 0.6px solid #cbd5e1; }
-    .grid-table td { padding: 12px 4px; border: 0.6px solid #cbd5e1; font-size: 11px; text-align: center; vertical-align: middle; overflow: hidden; }
     
-    .med-details-cell { width: 154px; max-width: 154px; text-align: left !important; font-weight: bold; font-size: 11px !important; }
-    .day-cell { width: 83px; max-width: 83px; }
+    .grid-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed !important; }
+    .grid-table th { background: #e2e8f0; color: black; font-weight: bold; font-size: 11px; padding: 10px 2px; text-align: center; border: 0.6px solid #cbd5e1; box-sizing: border-box; }
+    .grid-table td { padding: 10px 2px; border: 0.6px solid #cbd5e1; font-size: 11px; text-align: center; vertical-align: middle; overflow: hidden; white-space: nowrap; box-sizing: border-box; }
+    
+    .med-details-cell { width: 154pt !important; max-width: 154pt !important; text-align: left !important; font-weight: bold; font-size: 11px !important; white-space: normal !important; word-wrap: break-word !important; }
+    .day-cell { width: 83pt !important; max-width: 83pt !important; }
     
     .cap-label { font-size: 9px; color: #4a5568; font-weight: normal; display: block; margin-top: 2px; }
     .freq-label { font-size: 9px; color: #1a202c; font-style: italic; font-weight: normal; display: block; margin-top: 4px; }
     
-    .box-grid { display: inline-grid; grid-template-columns: repeat(2, 18px); gap: 7px; justify-content: center; align-content: center; }
+    .box-grid { display: inline-grid; grid-template-columns: repeat(2, 18px); gap: 7px; justify-content: center; align-content: center; vertical-align: middle; }
     .chk-box { width: 18px; height: 18px; border: 1.5px solid black; background: white; border-radius: 2px; box-sizing: border-box; }
     .status-passed { color: var(--passed); font-weight: normal; text-transform: uppercase; font-size: 10px; }
     .status-stop { color: var(--stop); font-weight: bold; font-size: 10px; text-transform: uppercase; }
     
-    .reminders-title { font-size: 24px; font-weight: bold; color: var(--primary); margin: 30px 0 15px 0; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
-    .reminder-item { font-size: 18px; line-height: 28px; margin-bottom: 12px; display: flex; align-items: flex-start; }
+    .reminders-title { font-size: 24px; font-weight: bold; color: var(--primary); margin: 0 0 15px 0; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+    .reminder-item { font-size: 16px; line-height: 26px; margin-bottom: 12px; display: flex; align-items: flex-start; white-space: normal !important; }
     .reminder-text { flex: 1; }
     .qr-container { display: flex; align-items: center; gap: 15px; margin-top: 8px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; width: fit-content; }
-    .qr-img { width: 90px; height: 90px; border: 1px solid #cbd5e1; background: white; }
-    .preview-placeholder { border: 2px dashed #cbd5e1; border-radius: 8px; height: 250px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic; background: #fafafa; width: 100%; }
+    .qr-img { width: 85px; height: 80px; border: 1px solid #cbd5e1; background: white; }
+    .preview-placeholder { border: 2px dashed #cbd5e1; border-radius: 8px; height: 200px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic; background: #fafafa; width: 100%; }
     
     @media print {
       body { background: white; padding: 0; color: black; }
       .print-hide { display: none !important; }
-      .sheet-body { border: none; box-shadow: none; padding: 0; margin: 0; width: 100%; }
+      .pdf-canvas-wrapper { background: white; padding: 0; border: none; }
+      .sheet-body { border: none; box-shadow: none; padding: 0; margin: 0; width: 792pt; height: 612pt; }
       .page-break { page-break-before: always; }
     }
   </style>
+</head>
 
 
 
-  // ==============================================================================
-  // ⚙️ SECTION 2: THE CALENDAR & AUTOMATED CATCH-UP TAPER Engine                  
-  // ==============================================================================
+  <body>
+  <div class="master-wrapper">
+    
+    <div class="print-hide" style="text-align: center; margin-bottom: 10px;">
+      <h1 style="color: var(--primary); margin: 0; font-size: 24px; font-weight: 800;">🏥 Ophthalmology Post-Op Drop Chart Manager</h1>
+      <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Fill out core parameters and compile your uneditable printable layout below.</p>
+    </div>
 
-  /**
-   * 🔍 CORE USER INPUT OVERRIDE TAPER MATHEMATICS ENGINE
-   * This function replaces your Python compute_daily_schedule loop.
-   * It calculates post-op frequencies day-by-day based purely on explicit dropdown choices.
-   */
+    <!-- Metadata Entry Blocks -->
+    <div class="card print-hide">
+      <h2>👤 Patient & Surgery Metadata</h2>
+      <div class="form-group">
+        <label>Patient Name</label>
+        <input type="text" id="p_name" placeholder="Enter patient name..." oninput="updatePreviewLive()">
+      </div>
+      <div class="form-group">
+        <label>Surgery Eye</label>
+        <select id="p_eye" onchange="updatePreviewLive()">
+          <option value="" disabled selected hidden>Select Eye...</option>
+          <option value="Right Eye (OD)">Right Eye (OD)</option>
+          <option value="Left Eye (OS)">Left Eye (OS)</option>
+          <option value="Both Eyes (OU)">Both Eyes (OU)</option>
+        </select>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="form-group">
+          <label>Surgery Date</label>
+          <input type="date" id="p_surg_date" onchange="applySurgicalPreset()">
+        </div>
+        <div class="form-group">
+          <label>Regimen/Visit Start Date</label>
+          <input type="date" id="p_start_date" onchange="calculateCatchUpFrequencies()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Total Tracking Weeks</label>
+        <input type="number" id="p_weeks" min="1" max="12" value="4" oninput="updatePreviewLive()">
+      </div>
+    </div>
+
+    <!-- Surgical Presets Dropdown Selector -->
+    <div class="card print-hide">
+      <h2>📋 Quick-Load Surgical Protocol Presets</h2>
+      <div class="form-group">
+        <label>Choose Protocol Template</label>
+        <select id="preset_selector" onchange="applySurgicalPreset()">
+          <option value="Blank / Custom" selected>Blank / Custom</option>
+          <option value="Cataract Surgery">Cataract Surgery</option>
+          <option value="Glaucoma Drainage Device (GDI)">Glaucoma Drainage Device (GDI)</option>
+          <option value="Laser Iridotomy">Laser Iridotomy</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Medication Sub-Accordions Shell Target -->
+    <div id="med_inputs_container" class="print-hide"></div>
+    
+    <!-- Action Panel Trigger Row Controls -->
+    <div class="card print-hide" style="display: flex; flex-direction: column; gap: 12px; padding: 20px;">
+      <button class="btn btn-secondary" id="add_row_btn_trigger">➕ Add Another Medication</button>
+      <button class="btn" style="background-color: #10B981 !important;" onclick="downloadAsPDFDocument()">💾 Download Official Chart PDF</button>
+      <button class="btn btn-blue" onclick="window.print()">🖨️ Print Chart to Office Printer</button>
+    </div>
+
+    <!-- Down-Stacked PDF Blueprint Sandbox Display Frame -->
+    <div class="card" style="width: 100%; box-sizing: border-box;">
+      <h2>📄 Live Post-Op PDF Preview Canvas</h2>
+      <div id="live_sheet_canvas_wrapper" class="pdf-canvas-wrapper">
+        <div id="live_sheet_canvas">
+          <div class="preview-placeholder print-hide">Your landscape PDF-style chart layout sheets will render here down below...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+    <script>
+  // Set default regimen/visit date to current calendar day on boot loading cycle
+  document.getElementById('p_start_date').value = new Date().toISOString().substring(0,10);
+
+  const defaultMeds = [
+    { name: "", cap: "", mode: "2. taper 1 drop on chosen day", freq: "qid", day: "Friday", disco: "" },
+    { name: "", cap: "", mode: "1. Discontinue on [date]", freq: "qid", day: "Friday", disco: "" },
+    { name: "", cap: "", mode: "1. Discontinue on [date]", freq: "qid", day: "Friday", disco: "" },
+    { name: "", cap: "", mode: "1. Discontinue on [date]", freq: "qid", day: "Friday", disco: "" },
+    { name: "", cap: "", mode: "1. Discontinue on [date]", freq: "qid", day: "Friday", disco: "" },
+    { name: "", cap: "", mode: "1. Discontinue on [date]", freq: "qid", day: "Friday", disco: "" }
+  ];
+
+  function initializeMedFormInputs() {
+    let html = "";
+    const modes_list = [
+      "0. Manual Comma String", "1. Discontinue on [date]", "2. taper 1 drop on chosen day", 
+      "3. *day for X week(s) and then taper 1 drop on chosen day", 
+      "4. *day for X week(s), then taper 1 drop on chosen day, and then continue qod",
+      "5. Laser Iridotomy (5d QID, 5d BID, 5d QDAY)"
+    ];
+    const freq_list = ["qday", "bid", "tid", "qid", "qod", "q4h", "q2h"];
+    const daysList = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    
+    for(let i=0; i<6; i++) {
+      html += `
+        <div class="card" id="med_card_${i}" style="display: ${i===0 ? 'block' : 'none'}; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 15px;">
+          <h3 style="margin-top:0; font-size:14px; color:var(--primary);">💧 Medication #${i+1} Settings ${i===0 ? '(Mandatory)' : ''}</h3>
+          <div class="form-group">
+            <label>Medication Name</label>
+            <input type="text" id="m_${i}_name" placeholder="Enter med name..." oninput="updatePreviewLive()">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group"><label>Cap Color</label><input type="text" id="m_${i}_cap" placeholder="Enter cap color..." oninput="updatePreviewLive()"></div>
+            <div class="form-group">
+              <label>Taper Mode Selector</label>
+              <select id="m_${i}_mode" onchange="handleModeUIChange(${i}); updatePreviewLive();">
+                ${modes_list.map(m => `<option value="${m}" ${m==='1. Discontinue on [date]'?'selected':''}>${m}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label>Starting Drop Frequency</label>
+              <select id="m_${i}_freq" onchange="updatePreviewLive()">
+                ${freq_list.map(f => `<option value="${f}" ${f==='qid'?'selected':''}>${f}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group" id="m_${i}_day_group"><label>Taper Weekday</label>
+              <select id="m_${i}_day" onchange="updatePreviewLive()">
+                ${daysList.map(d => `<option value="${d}" ${d==='Friday'?'selected':''}>${d}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-group" id="m_${i}_disco_group" style="display:none;"><label>Select Discontinue Date</label><input type="date" id="m_${i}_disco" onchange="updatePreviewLive()"></div>
+          <div class="form-group" id="m_${i}_hold_group" style="display:none;"><label>Hold Weeks Flat</label><input type="number" id="m_${i}_hold" value="1" min="1" oninput="updatePreviewLive()"></div>
+          <div class="form-group" id="m_${i}_manual_group" style="display:none;"><label>Enter Manual Comma List</label><input type="text" id="m_${i}_manual" value="4,3,2,1,0,0,0,0,0,0,0,0" oninput="updatePreviewLive()"></div>
+        </div>
+      `;
+    }
+    document.getElementById('med_inputs_container').innerHTML = html;
+  }
+  initializeMedFormInputs();
+
+  function handleModeUIChange(i) {
+    const mode = document.getElementById(`m_${i}_mode`).value;
+    document.getElementById(`m_${i}_disco_group`).style.display = mode.includes("1.") ? "block" : "none";
+    document.getElementById(`m_${i}_day_group`).style.display = (mode.includes("2.") || mode.includes("3.") || mode.includes("4.")) ? "block" : "none";
+    document.getElementById(`m_${i}_hold_group`).style.display = (mode.includes("3.") || mode.includes("4.")) ? "block" : "none";
+    document.getElementById(`m_${i}_manual_group`).style.display = mode.includes("0. Manual") ? "block" : "none";
+  }
+
+  function getFrequencyText(freqNum) {
+    const freqMap = { 1: "1 time a day", 2: "2 times a day", 3: "3 times a day", 4: "4 times a day", 6: "6 times a day", 12: "12 times a day" };
+    return freqMap[freqNum] || "";
+  }
+
   function computeDailySchedule(startRegimenDt, baseStartDate, itemDict, surgDt) {
-    const mode = itemDict.mode;
-    const taperDay = itemDict.day;
-    const startFreq = itemDict.freq;
-    const holdWks = parseInt(itemDict.hold) || 1;
-    const discoDateStr = itemDict.disco;
-    const manualStr = itemDict.manual || "4,3,2,1,0,0,0,0";
+    const mode = itemDict.mode; const taperDay = itemDict.day; const startFreq = itemDict.freq;
+    const holdWks = parseInt(itemDict.hold) || 1; const discoDateStr = itemDict.disco; const manualStr = itemDict.manual;
 
     const weekdaysList = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const targetWeekdayIdx = weekdaysList.indexOf(taperDay);
     
     let cutoffDt = null;
-    if (discoDateStr && discoDateStr.trim().length >= 10) {
-      cutoffDt = new Date(discoDateStr.trim().substring(0,10) + 'T00:00:00');
-    }
+    if (discoDateStr && discoDateStr.trim().length >= 10) cutoffDt = new Date(discoDateStr.trim().substring(0,10) + 'T00:00:00');
     const hasDiscoLimit = cutoffDt && cutoffDt > surgDt;
     
-    // Maps text selections onto exact vector numbers matching your ReportLab matrix parameters
     const freqMap = { qday: 1, bid: 2, tid: 3, qid: 4, qod: 1, q4h: 6, q2h: 12 };
     const userSelectedDrops = freqMap[startFreq] || 0;
     
-    let dailyMap = {};
-    let currentDt = new Date(baseStartDate.getTime());
+    let dailyMap = {}; let currentDt = new Date(baseStartDate.getTime());
     
-    // Runs an identical 120-day timeline analysis array loop to match Python constraints
     for (let dayCount = 0; dayCount < 120; dayCount++) {
       let dateKeyStr = currentDt.toISOString().substring(0,10);
-      
-      // If calendar tracker is evaluating days before the patient's current visit, flag as PASSED
-      if (currentDt < startRegimenDt) {
-        dailyMap[dateKeyStr] = -1;
-        currentDt.setTime(currentDt.getTime() + (24 * 60 * 60 * 1000));
-        continue;
-      }
-      
-      // 🔍 DISCONTINUE BOUNDARY FIXED: Drops are drawn fully up until the final morning cutoff date
-      if (hasDiscoLimit && mode.includes("1. Discontinue on [date]") && currentDt >= cutoffDt) {
-        dailyMap[dateKeyStr] = 0;
-        currentDt.setTime(currentDt.getTime() + (24 * 60 * 60 * 1000));
-        continue;
-      }
+      if (currentDt < startRegimenDt) { dailyMap[dateKeyStr] = -1; currentDt.setTime(currentDt.getTime() + (24 * 60 * 60 * 1000)); continue; }
+      if (hasDiscoLimit && mode.includes("1. Discontinue on [date]") && currentDt >= cutoffDt) { dailyMap[dateKeyStr] = 0; currentDt.setTime(currentDt.getTime() + (24 * 60 * 60 * 1000)); continue; }
       
       let daysSinceRegimenStart = Math.floor((currentDt - startRegimenDt) / (24 * 60 * 60 * 1000));
       
@@ -136,589 +260,154 @@
         else if (daysSinceRegimenStart < 10) dailyMap[dateKeyStr] = 2;
         else if (daysSinceRegimenStart < 15) dailyMap[dateKeyStr] = 1;
         else dailyMap[dateKeyStr] = 0;
-      } 
-      else if (startFreq === "qod" && mode.includes("1. Discontinue on [date]")) {
+      } else if (startFreq === "qod" && mode.includes("1. Discontinue on [date]")) {
         dailyMap[dateKeyStr] = (daysSinceRegimenStart % 2 === 0) ? 1 : 0;
-      } 
-      else if (mode.includes("1. Discontinue on [date]")) {
+      } else if (mode.includes("1. Discontinue on [date]")) {
         dailyMap[dateKeyStr] = userSelectedDrops;
-      } 
-      else if (mode.includes("2. taper 1 drop on chosen day")) {
-        let wCount = 0;
-        let checkDt = new Date(startRegimenDt.getTime());
+      } else if (mode.includes("2. taper 1 drop on chosen day")) {
+        let wCount = 0; let checkDt = new Date(startRegimenDt.getTime());
         while (checkDt <= currentDt) {
           if (checkDt.getDay() === targetWeekdayIdx && checkDt.getTime() !== startRegimenDt.getTime()) wCount++;
           checkDt.setTime(checkDt.getTime() + (24 * 60 * 60 * 1000));
         }
         dailyMap[dateKeyStr] = Math.max(0, userSelectedDrops - wCount);
-      } 
-      else if (mode.includes("3. *day for X week(s) and then taper")) {
-        if (daysSinceRegimenStart < (holdWks * 7)) {
-          dailyMap[dateKeyStr] = userSelectedDrops;
-        } else {
-          let tStart = new Date(startRegimenDt.getTime() + (holdWks * 7 * 24 * 60 * 60 * 1000));
-          let wCount = 0;
-          let checkDt = new Date(tStart.getTime());
-          while (checkDt <= currentDt) {
-            if (checkDt.getDay() === targetWeekdayIdx && checkDt.getTime() !== tStart.getTime()) wCount++;
-            checkDt.setTime(checkDt.getTime() + (24 * 60 * 60 * 1000));
-          }
-          dailyMap[dateKeyStr] = Math.max(0, userSelectedDrops - wCount);
-        }
-      } 
-      else if (mode.includes("4. *day for X week(s), then taper")) {
-        if (daysSinceRegimenStart < (holdWks * 7)) {
-          dailyMap[dateKeyStr] = userSelectedDrops;
-        } else {
-          let tStart = new Date(startRegimenDt.getTime() + (holdWks * 7 * 24 * 60 * 60 * 1000));
-          let wCount = 0;
-          let checkDt = new Date(tStart.getTime());
-          while (checkDt <= currentDt) {
-            if (checkDt.getDay() === targetWeekdayIdx && checkDt.getTime() !== tStart.getTime()) wCount++;
-            checkDt.setTime(checkDt.getTime() + (24 * 60 * 60 * 1000));
-          }
-          let calcTaper = userSelectedDrops - wCount;
-          if (calcTaper > 1) {
-            dailyMap[dateKeyStr] = calcTaper;
-          } else {
-            let qodCount = Math.floor((currentDt - tStart) / (24 * 60 * 60 * 1000));
-            dailyMap[dateKeyStr] = (qodCount % 2 === 0) ? 1 : 0;
-          }
-        }
-      } 
-      else {
-        let wIdx = Math.floor(daysSinceRegimenStart / 7);
-        let manualList = manualStr.split(",").map(Number);
-        dailyMap[dateKeyStr] = wIdx < manualList.length ? manualList[wIdx] : 0;
+      } else {
+        let wIdx = Math.floor(daysSinceRegimenStart / 7); let mArr = manualStr.split(",").map(Number);
+        dailyMap[dateKeyStr] = wIdx < mArr.length ? mArr[wIdx] : 0;
       }
-      
-      // Step the calendar forward exactly 24 hours
       currentDt.setTime(currentDt.getTime() + (24 * 60 * 60 * 1000));
     }
     return dailyMap;
   }
+</script>
 
 
-  // ==============================================================================
-  // 🖨️ SECTION 3: THE HIGH-CONTRAST CHART GENERATOR & GRID COMPILER              
-  // ==============================================================================
 
-  /**
-   * Translates numeric drop frequencies into standard clinical instruction text strings.
-   */
-  function getFrequencyText(freqNum) {
-    const freqMap = { 1: "1 time a day", 2: "2 times a day", 3: "3 times a day", 4: "4 times a day", 6: "6 times a day", 12: "12 times a day" };
-    return freqMap[freqNum] || "";
+    <script>
+  function appendRemindersLayoutBlock(currentHtmlContent, hasLaserIridotomyActive) {
+    let outputMarkup = currentHtmlContent;
+    outputMarkup += `<div class="page-break"></div><div class="reminders-title">Reminders:</div>`;
+    
+    const youtubeUrl = "https://youtube.com";
+    const videoInstructionSnippet = `Use the Punctal Occlusion Technique<br/>&nbsp;&nbsp;&nbsp;&nbsp;Link: <font color="blue"><u>${youtubeUrl}</u></font>
+      <div class="qr-container"><img class="qr-img" src="https://qrserver.com{encodeURIComponent(youtubeUrl)}" /></div>`;
+
+    if (hasLaserIridotomyActive) {
+      outputMarkup += `
+        <div class="reminder-item"><div class="reminder-text">1. Wait at least 10 minutes in between drops.</div></div>
+        <div class="reminder-item"><div class="reminder-text">2. ${videoInstructionSnippet}</div></div>
+        <div class="reminder-item"><div class="reminder-text">3. Do not forget to take your other drops if instructed to do so.</div></div>
+        <div class="reminder-item"><div class="reminder-text">4. If you have a decrease in vision, call us at 1(212) 979-4120.</div></div>`;
+    } else {
+      outputMarkup += `
+        <div class="reminder-item"><div class="reminder-text">1. No bending over, no straining, no squatting, and no lifting weight over 5 lbs.</div></div>
+        <div class="reminder-item"><div class="reminder-text">2. Sleep with the plastic eye shield for 2 weeks.</div></div>
+        <div class="reminder-item"><div class="reminder-text">3. Wait at least 10 minutes in between drops.</div></div>
+        <div class="reminder-item"><div class="reminder-text">4. ${videoInstructionSnippet}</div></div>
+        <div class="reminder-item"><div class="reminder-text">5. Do not forget to take your other drops.</div></div>
+        <div class="reminder-item"><div class="reminder-text">6. If you have a decrease in vision, call us at 1(212) 979-4120.</div></div>`;
+    }
+    outputMarkup += `</div>`; return outputMarkup;
   }
 
-  /**
-   * Core UI Layout compiler framework.
-   * This logic replaces your Python generate_pdf_from_ui method.
-   * It builds your chart rows live inside your browser frame on the right canvas.
-   */
   function renderLiveSheetCanvas(patientName, surgeryEye, surgeryDateStr, totalWeeks, startRegimenDateStr, activeRowCount, rawMedsArray) {
-    const surgDt = new Date(surgeryDateStr + 'T00:00:00');
-    const baseStartDate = new Date(surgDt.getTime() + (24 * 60 * 60 * 1000));
-    const startRegimenDt = new Date(startRegimenDateStr + 'T00:00:00');
+    const surgDt = new Date(surgeryDateStr + 'T00:00:00'); const baseStartDate = new Date(surgDt.getTime() + (24 * 60 * 60 * 1000)); const startRegimenDt = new Date(startRegimenDateStr + 'T00:00:00');
+    let htmlMarkup = `<div class="sheet-body" id="pdf_print_capture_zone"><div class="sheet-title">POST-OPERATIVE EYE DROP SCHEDULE</div><div class="sheet-meta"><b>Patient Name:</b> ${patientName || '____________________'} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Surgery Eye:</b> ${surgeryEye || '__________'} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Surgery Date:</b> ${surgDt.toLocaleDateString()}</div>`;
     
-    const metaName = patientName.trim() ? patientName.trim() : "____________________";
-    const selectedEye = surgeryEye ? surgeryEye : "__________";
-    
-    // Builds the master layout card header block matching your landscape blueprints
-    let htmlMarkup = `
-      <div class="sheet-body" id="pdf_print_capture_zone">
-        <div class="sheet-title">POST-OPERATIVE EYE DROP SCHEDULE</div>
-        <div class="sheet-meta">
-          <b>Patient Name:</b> ${metaName} &nbsp;&nbsp;|&nbsp;&nbsp; 
-          <b>Surgery Eye:</b> ${selectedEye} &nbsp;&nbsp;|&nbsp;&nbsp; 
-          <b>Surgery Date:</b> ${surgDt.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
-        </div>
-    `;
-
-    let medSchedules = [];
-    let hasLaserIridotomyActive = false;
-    const targetRowLimit = Math.min(parseInt(activeRowCount) || 1, 6);
-
-    // 🔍 ACCELERATED ENGINE UPGRADE: Processes only the active medication datasets to prevent lag
-    for (let idx = 0; idx < targetRowLimit; idx++) {
-      let med = rawMedsArray[idx];
-      if (med.mode.includes("5. Laser Iridotomy")) {
-        hasLaserIridotomyActive = true;
-      }
-
-      let dailyMap = computeDailySchedule(startRegimenDt, baseStartDate, med, surgDt);
-      medSchedules.push({
-        name: med.name.trim() ? med.name.trim() : `Medication ${idx + 1}`,
-        cap: med.cap.trim() ? `(${med.cap.trim()})` : "",
-        dailyMap: dailyMap,
-        discoDateStr: med.disco.trim(),
-        modeStr: med.mode
-      });
+    let medSchedules = []; let hasLaser = false;
+    for (let idx = 0; idx < activeRowCount; idx++) {
+      let med = rawMedsArray[idx]; if (med.mode.includes("5. Laser")) hasLaser = true;
+      medSchedules.push({ name: med.name, cap: med.cap ? `(${med.cap})` : "", dailyMap: computeDailySchedule(startRegimenDt, baseStartDate, med, surgDt), discoDateStr: med.disco, modeStr: med.mode });
     }
 
-    const daysSinceStart = Math.floor((startRegimenDt - baseStartDate) / (24 * 60 * 60 * 1000));
-    const visitPostOpWeek = Math.floor(daysSinceStart / 7) + 1;
-
-    // Generates calendar charts card by card matching your total tracing week selector parameters
+    const visitPostOpWeek = Math.floor(Math.floor((startRegimenDt - baseStartDate) / (24 * 60 * 60 * 1000)) / 7) + 1;
     for (let wLoop = 0; wLoop < parseInt(totalWeeks); wLoop++) {
       let trueRecupWk = visitPostOpWeek + wLoop;
-      let daysToTrueWeekStart = (trueRecupWk - 1) * 7;
-      let weekStartDate = new Date(baseStartDate.getTime() + (daysToTrueWeekStart * 24 * 60 * 60 * 1000));
-      let weekEndDate = new Date(weekStartDate.getTime() + (6 * 24 * 60 * 60 * 1000));
+      let weekStartDate = new Date(baseStartDate.getTime() + ((trueRecupWk - 1) * 7 * 24 * 60 * 60 * 1000));
+      let visibleMeds = medSchedules.filter(ms => !(ms.modeStr.includes("1. Discontinue") && ms.discoDateStr && weekStartDate >= new Date(ms.discoDateStr + 'T00:00:00')));
+      if (visibleMeds.length === 0) continue;
 
-      // 🔍 ROW RE-TERMINATOR FILTER: Removes completely discontinued medications starting on the next card week
-      let activeMedRows = [];
-      medSchedules.forEach(ms => {
-        let hasActiveDropsThisWeek = false;
-        for (let d = 0; d < 7; d++) {
-          let testDateStr = new Date(weekStartDate.getTime() + (d * 24 * 60 * 60 * 1000)).toISOString().substring(0,10);
-          if ((ms.dailyMap[testDateStr] || 0) > 0) {
-            hasActiveDropsThisWeek = true;
-          }
-        }
-        let isInitialRegimenWeek = (weekStartDate <= startRegimenDt && startRegimenDt <= weekEndDate);
-
-        let hasPastDiscontinueThreshold = false;
-        if (ms.modeStr.includes("1. Discontinue on [date]") && ms.discoDateStr) {
-          try {
-            let cutoffDt = new Date(ms.discoDateStr + 'T00:00:00');
-            if (weekStartDate >= cutoffDt) {
-              hasPastDiscontinueThreshold = true;
-            }
-          } catch (err) {}
-        }
-
-        if ((hasActiveDropsThisWeek || isInitialRegimenWeek) && !hasPastDiscontinueThreshold) {
-          activeMedRows.push(ms);
-        }
-      });
-
-      if (activeMedRows.length === 0) continue;
-
-      htmlMarkup += `
-        <div class="week-block">
-          <div class="week-header">POST-OP WEEK #${trueRecupWk}</div>
-          <table class="grid-table">
-            <thead>
-              <tr>
-                <th class="med-details-cell">Medication Details</th>
-      `;
-
-      // Draws the rolling day headers showing matching Post-Op Day counts
-      const shortDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      htmlMarkup += `<div class="week-block"><div class="week-header">POST-OP WEEK #${trueRecupWk}</div><table class="grid-table"><thead><tr><th class="med-details-cell">Medication Details</th>`;
       for (let d = 0; d < 7; d++) {
-        let currentDate = new Date(weekStartDate.getTime() + (d * 24 * 60 * 60 * 1000));
-        let postOpDayNum = Math.floor((currentDate - surgDt) / (24 * 60 * 60 * 1000)) + 1;
-        htmlMarkup += `
-          <th class="day-cell">
-            <b>${shortDays[currentDate.getDay()]} ${String(currentDate.getMonth() + 1).padStart(2, '0')}/${String(currentDate.getDate()).padStart(2, '0')}</b><br/>
-            <span style="font-weight:normal; font-size:8px;">POD #${postOpDayNum}</span>
-          </th>
-        `;
+        let cur = new Date(weekStartDate.getTime() + (d * 24 * 60 * 60 * 1000));
+        htmlMarkup += `<th class="day-cell"><b>${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][cur.getDay()]} ${cur.getMonth()+1}/${cur.getDate()}</b><br/><span style="font-size:8px;">POD #${Math.floor((cur - surgDt)/(24*60*60*1000))+1}</span></th>`;
       }
       htmlMarkup += `</tr></thead><tbody>`;
 
-      // Maps individual medication cell markup layouts inside the table rows grid container
-      activeMedRows.forEach(ms => {
-        let weekFrequencies = [];
+      visibleMeds.forEach(ms => {
+        htmlMarkup += `<tr><td class="med-details-cell"><b>${ms.name}</b><br/><span class="cap-label">${ms.cap}</span></td>`;
         for (let d = 0; d < 7; d++) {
-          let testDateStr = new Date(weekStartDate.getTime() + (d * 24 * 60 * 60 * 1000)).toISOString().substring(0,10);
-          let fVal = ms.dailyMap[testDateStr] || 0;
-          if (fVal > 0 && !weekFrequencies.includes(fVal)) {
-            weekFrequencies.push(fVal);
-          }
-        }
-
-        let freqInstruction = "";
-        if (weekFrequencies.length === 1) {
-          freqInstruction = `<br/><span class="freq-label"><i>${getFrequencyText(weekFrequencies[0])}</i></span>`;
-        } else if (weekFrequencies.length > 1) {
-          let textParts = weekFrequencies.map(f => getFrequencyText(f));
-          freqInstruction = `<br/><span class="freq-label"><i>${textParts.join(', then ')}</i></span>`;
-        }
-
-        let capString = ms.cap ? `<br/><span class="cap-label">${ms.cap}</span>` : "";
-        htmlMarkup += `
-          <tr>
-            <td class="med-details-cell">
-              <span><b>${ms.name}</b></span>${capString}${freqInstruction}
-            </td>
-        `;
-
-        // Draws the vector box checkboxes inside each daily calendar element space
-        for (let d = 0; d < 7; d++) {
-          let currentDate = new Date(weekStartDate.getTime() + (d * 24 * 60 * 60 * 1000));
-          let dateStr = currentDate.toISOString().substring(0,10);
-          let freqVal = ms.dailyMap[dateStr] || 0;
-
-          if (currentDate < startRegimenDt) {
-            htmlMarkup += `<td class="status-passed">PASSED</td>`;
-          } else if (ms.modeStr.includes("1. Discontinue") && ms.discoDateStr && currentDate >= new Date(ms.discoDateStr + 'T00:00:00')) {
-            htmlMarkup += `<td class="status-stop">DISCONTINUE</td>`;
-          } else if (freqVal > 0) {
-            // Renders the exact requested 18pt checkboxes with 7pt grid separation matrix overlay
-            let checkboxBlocks = `<div class="box-grid">`;
-            for (let b = 0; b < freqVal; b++) {
-              checkboxBlocks += `<div class="chk-box"></div>`;
-            }
-            checkboxBlocks += `</div>`;
-            htmlMarkup += `<td>${checkboxBlocks}</td>`;
-          } else {
-            htmlMarkup += `<td class="status-passed">Finished</td>`;
-          }
+          let cur = new Date(weekStartDate.getTime() + (d * 24 * 60 * 60 * 1000));
+          let fVal = ms.dailyMap[cur.toISOString().substring(0,10)] || 0;
+          if (cur < startRegimenDt) htmlMarkup += `<td class="status-passed">PASSED</td>`;
+          else if (ms.modeStr.includes("1. Discontinue") && ms.discoDateStr && cur >= new Date(ms.discoDateStr + 'T00:00:00')) htmlMarkup += `<td class="status-stop">DISCONTINUE</td>`;
+          else if (fVal > 0) {
+            let boxes = `<div class="box-grid">`; for(let b=0; b<fVal; b++) boxes += `<div class="chk-box"></div>`; boxes += `</div>`;
+            htmlMarkup += `<td>${boxes}</td>`;
+          } else htmlMarkup += `<td class="status-passed">Finished</td>`;
         }
         htmlMarkup += `</tr>`;
       });
       htmlMarkup += `</tbody></table></div>`;
     }
-
-    // Passes formatting controls over to the reminders block attachment assembler layer function
-    htmlMarkup = appendRemindersLayoutBlock(htmlMarkup, hasLaserIridotomyActive);
-    document.getElementById('live_sheet_canvas').innerHTML = htmlMarkup;
+    document.getElementById('live_sheet_canvas').innerHTML = appendRemindersLayoutBlock(htmlMarkup, hasLaser);
   }
 
-
-    // ==============================================================================
-  // 🖨️ SECTION 3.1: THE HIGH-VISIBILITY PATIENT REMINDERS BLOCK                  
-  // ==============================================================================
-
-  /**
-   * Appends the post-operative instructions layout block to the sheet markup.
-   * This logic replaces your Python append_reminders_and_build function.
-   * It handles conditional reminder rendering based on active laser iridotomy flags.
-   */
-  function appendRemindersLayoutBlock(currentHtmlContent, hasLaserIridotomyActive) {
-    let outputMarkup = currentHtmlContent;
-    
-    // Forces a physical print page break so instructions stay isolated on a clean sheet
-    outputMarkup += `
-      <div class="page-break"></div>
-      <div class="reminders-title">Reminders:</div>
-    `;
-
-    // Shared video instruction markup text matching your ReportLab parameters
-    const youtubeUrl = "https://youtube.com";
-    const videoInstructionSnippet = `
-      Use the Punctal Occlusion Technique<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;Learn how to do so with this video on YouTube:<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;How to Take Eye Drops - Robert Ritch, MD<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;(Link: <font color="blue"><u>${youtubeUrl}</u></font>)
-      <div class="qr-container">
-        <img class="qr-img" src="https://qrserver.com{encodeURIComponent(youtubeUrl)}" alt="Video QR Link" />
-        <span style="font-size:12px; color:#4a5568; font-weight:normal; margin-left:10px;">Scan to watch drop technique tutorial video</span>
-      </div>
-    `;
-
-    if (hasLaserIridotomyActive) {
-      outputMarkup += `
-        <div class="reminder-item"><div class="reminder-text">1. Wait at least 10 minutes in between drops.</div></div>
-        <div class="reminder-item"><div class="reminder-text">2. ${videoInstructionSnippet}</div></div>
-        <div class="reminder-item"><div class="reminder-text">3. Do not forget to take your other drops if instructed to do so.</div></div>
-        <div class="reminder-item"><div class="reminder-text">4. If you have a decrease in vision, call us at <b>1(212) 979-4120</b> to see an ophthalmologist as soon as possible.</div></div>
-      `;
-    } else {
-      outputMarkup += `
-        <div class="reminder-item"><div class="reminder-text">1. No bending over, no straining, no squatting nor crouching to pick items up off the floor, and no lifting weight more than 5 lbs.</div></div>
-        <div class="reminder-item"><div class="reminder-text">2. Make sure to sleep with the plastic eye shield for 2 weeks.</div></div>
-        <div class="reminder-item"><div class="reminder-text">3. Wait at least 10 minutes in between drops.</div></div>
-        <div class="reminder-item"><div class="reminder-text">4. ${videoInstructionSnippet}</div></div>
-        <div class="reminder-item"><div class="reminder-text">5. Do not forget to take your other drops if instructed to do so.</div></div>
-        <div class="reminder-item"><div class="reminder-text">6. If you have a decrease in vision, call us at <b>1(212) 979-4120</b> to see an ophthalmologist as soon as possible.</div></div>
-      `;
-    }
-
-    outputMarkup += `</div>`;
-    return outputMarkup;
-  }
-
-
-    // ==============================================================================
-  // 🖨️ SECTION 3.1: THE HIGH-VISIBILITY PATIENT REMINDERS BLOCK                  
-  // ==============================================================================
-
-  /**
-   * Appends the post-operative instructions layout block to the sheet markup.
-   * This logic replaces your Python append_reminders_and_build function.
-   * It handles conditional reminder rendering based on active laser iridotomy flags.
-   */
-  function appendRemindersLayoutBlock(currentHtmlContent, hasLaserIridotomyActive) {
-    let outputMarkup = currentHtmlContent;
-    
-    // Forces a physical print page break so instructions stay isolated on a clean sheet
-    outputMarkup += `
-      <div class="page-break"></div>
-      <div class="reminders-title">Reminders:</div>
-    `;
-
-    // Shared video instruction markup text matching your ReportLab parameters
-    const youtubeUrl = "https://youtube.com";
-    const videoInstructionSnippet = `
-      Use the Punctal Occlusion Technique<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;Learn how to do so with this video on YouTube:<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;How to Take Eye Drops - Robert Ritch, MD<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;(Link: <font color="blue"><u>${youtubeUrl}</u></font>)
-      <div class="qr-container">
-        <img class="qr-img" src="https://qrserver.com{encodeURIComponent(youtubeUrl)}" alt="Video QR Link" />
-        <span style="font-size:12px; color:#4a5568; font-weight:normal; margin-left:10px;">Scan to watch drop technique tutorial video</span>
-      </div>
-    `;
-
-    if (hasLaserIridotomyActive) {
-      outputMarkup += `
-        <div class="reminder-item"><div class="reminder-text">1. Wait at least 10 minutes in between drops.</div></div>
-        <div class="reminder-item"><div class="reminder-text">2. ${videoInstructionSnippet}</div></div>
-        <div class="reminder-item"><div class="reminder-text">3. Do not forget to take your other drops if instructed to do so.</div></div>
-        <div class="reminder-item"><div class="reminder-text">4. If you have a decrease in vision, call us at <b>1(212) 979-4120</b> to see an ophthalmologist as soon as possible.</div></div>
-      `;
-    } else {
-      outputMarkup += `
-        <div class="reminder-item"><div class="reminder-text">1. No bending over, no straining, no squatting nor crouching to pick items up off the floor, and no lifting weight more than 5 lbs.</div></div>
-        <div class="reminder-item"><div class="reminder-text">2. Make sure to sleep with the plastic eye shield for 2 weeks.</div></div>
-        <div class="reminder-item"><div class="reminder-text">3. Wait at least 10 minutes in between drops.</div></div>
-        <div class="reminder-item"><div class="reminder-text">4. ${videoInstructionSnippet}</div></div>
-        <div class="reminder-item"><div class="reminder-text">5. Do not forget to take your other drops if instructed to do so.</div></div>
-        <div class="reminder-item"><div class="reminder-text">6. If you have a decrease in vision, call us at <b>1(212) 979-4120</b> to see an ophthalmologist as soon as possible.</div></div>
-      `;
-    }
-
-    outputMarkup += `</div>`;
-    return outputMarkup;
-  }
-
-
-
-    // ==============================================================================
-  // ⚙️ SECTION 4.0: THE DATA INTERCEPTION & LIVE CANVAS REFRESHER                 
-  // ==============================================================================
-
-  /**
-   * Main form compilation coordinator.
-   * This logic replaces your Python validate_and_compile framework handler.
-   */
   function updatePreviewLive() {
-    const surgeryDateRaw = document.getElementById('p_surg_date').value;
-    const regimenDateRaw = document.getElementById('p_start_date').value;
-    
-    // Safety Fallback: Stops loop if foundational dates are blank to prevent system lag
+    const surgeryDateRaw = document.getElementById('p_surg_date').value; const regimenDateRaw = document.getElementById('p_start_date').value;
     if (!surgeryDateRaw || !regimenDateRaw) return;
-
-    const patientName = document.getElementById('p_name').value;
-    const surgeryEye = document.getElementById('p_eye').value;
-    const totalWeeks = document.getElementById('p_weeks').value || 4;
-
-    const surgClean = String(surgeryDateRaw).trim().substring(0, 10);
-    const regClean = String(regimenDateRaw).trim().substring(0, 10);
-
     let compiledMedsArray = [];
-    
     for (let i = 0; i < 6; i++) {
-      const cardElement = document.getElementById(`med_card_${i}`);
-      if (cardElement && cardElement.style.display !== "none") {
-        let discoDateRaw = document.getElementById(`m_${i}_disco`).value;
-        let discoClean = discoDateRaw ? String(discoDateRaw).trim().substring(0, 10) : surgClean;
-        
+      if (document.getElementById(`med_card_${i}`).style.display !== "none") {
         compiledMedsArray.push({
-          name: document.getElementById(`m_${i}_name`).value || `Medication ${i + 1}`,
-          cap: document.getElementById(`m_${i}_cap`).value || "",
-          mode: document.getElementById(`m_${i}_mode`).value,
-          freq: document.getElementById(`m_${i}_freq`).value,
-          day: document.getElementById(`m_${i}_day`).value,
-          disco: discoClean,
-          hold: parseInt(document.getElementById(`m_${i}_hold`).value) || 1,
-          manual: document.getElementById(`m_${i}_manual`).value || "4,3,2,1,0,0,0,0"
+          name: document.getElementById(`m_${i}_name`).value, cap: document.getElementById(`m_${i}_cap`).value,
+          mode: document.getElementById(`m_${i}_mode`).value, freq: document.getElementById(`m_${i}_freq`).value,
+          day: document.getElementById(`m_${i}_day`).value, disco: document.getElementById(`m_${i}_disco`).value,
+          hold: parseInt(document.getElementById(`m_${i}_hold`).value)||1, manual: document.getElementById(`m_${i}_manual`).value
         });
       }
     }
-
-    const currentVisibleCount = compiledMedsArray.length;
-
-    // Fires the Section 3 layout table compiler to refresh the uneditable visual sheet
-    renderLiveSheetCanvas(
-      patientName, 
-      surgeryEye, 
-      surgClean, 
-      totalWeeks, 
-      regClean, 
-      currentVisibleCount, 
-      compiledMedsArray
-    );
+    renderLiveSheetCanvas(document.getElementById('p_name').value, document.getElementById('p_eye').value, surgeryDateRaw, document.getElementById('p_weeks').value, regimenDateRaw, compiledMedsArray.length, compiledMedsArray);
   }
 
-
-
-
-  // ==============================================================================
-  // ⚙️ SECTION 4.1: SURGICAL PROTOCOL PRESETS CONNECTOR & CLIENT DOWNLOADS       
-  // ==============================================================================
-
-  /**
-   * Automates form value assignments based on chosen surgical protocols.
-   * This logic replaces your Python apply_surgery_preset framework method.
-   */
   function applySurgicalPreset() {
-    const presetChoice = document.getElementById('preset_selector').value;
-    const surgeryDateRaw = document.getElementById('p_surg_date').value;
-    const regimenDateRaw = document.getElementById('p_start_date').value;
-    
-    const todayStr = new Date().toISOString().substring(0, 10);
-    const baseDateStr = (surgeryDateRaw && surgeryDateRaw.trim().length >= 10) ? surgeryDateRaw.trim().substring(0, 10) : todayStr;
-    const regDateStr = (regimenDateRaw && regimenDateRaw.trim().length >= 10) ? regimenDateRaw.trim().substring(0, 10) : todayStr;
+    const preset = document.getElementById('preset_selector').value; const surgStr = document.getElementById('p_surg_date').value; if (!surgStr) return;
+    const surgDt = new Date(surgStr + 'T00:00:00'); const pod1DayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][new Date(surgDt.getTime() + 24*60*60*1000).getDay()];
+    const format = (d) => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 
-    let baseDt = new Date(baseDateStr + 'T00:00:00');
-    if (isNaN(baseDt.getTime())) baseDt = new Date();
-    let regDt = new Date(regDateStr + 'T00:00:00');
-    if (isNaN(regDt.getTime())) regDt = new Date();
-
-    // AUTOMATIC WEEKDAY DISCOVERY: Configures taper weekday values to match POD #1 automatically
-    const pod1Dt = new Date(baseDt.getTime() + (24 * 60 * 60 * 1000));
-    const fullWeekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const pod1WeekdayName = fullWeekdays[pod1Dt.getDay()];
-    const targetWeekdayIdx = pod1Dt.getDay();
-
-    let preTaperEvents = 0;
-    let checkRunDt = new Date(pod1Dt.getTime());
-    while (checkRunDt <= regDt) {
-      if (checkRunDt.getDay() === targetWeekdayIdx && checkRunDt.getTime() !== pod1Dt.getTime()) {
-        preTaperEvents++;
-      }
-      checkRunDt.setTime(checkRunDt.getTime() + (24 * 60 * 60 * 1000));
-    }
-
-    const freqSequence = ["qday", "bid", "tid", "qid"];
-    const calculatedStartFreq = freqSequence[Math.max(0, 3 - preTaperEvents)];
-
-    const formatOffset = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    const cataractMoxiDisco = formatOffset(new Date(baseDt.getTime() + (6 * 24 * 60 * 60 * 1000)));
-    const cataractKetoDisco = formatOffset(new Date(baseDt.getTime() + (22 * 24 * 60 * 60 * 1000)));
-    const gdiMoxiDisco = formatOffset(new Date(baseDt.getTime() + (29 * 24 * 60 * 60 * 1000)));
-
-    // Clear form visibilities to custom baseline layers first
-    for (let i = 1; i < 6; i++) {
-      document.getElementById(`med_card_${i}`).style.display = "none";
-    }
-    document.getElementById('add_row_btn_trigger').style.display = "block";
+    for(let i=1; i<6; i++) document.getElementById(`med_card_${i}`).style.display = "none";
     activeVisibleCounterState = 1;
 
-    if (presetChoice === "Cataract Surgery") {
-      document.getElementById('med_card_0').style.display = "block";
-      document.getElementById('med_card_1').style.display = "block";
-      document.getElementById('med_card_2').style.display = "block";
-      activeVisibleCounterState = 3;
-
-      document.getElementById('m_0_name').value = "Prednisolone Acetate 1%";
-      document.getElementById('m_0_cap').value = "Pink Cap";
-      document.getElementById('m_0_mode').value = "2. taper 1 drop on chosen day";
-      document.getElementById('m_0_freq').value = calculatedStartFreq;
-      document.getElementById('m_0_day').value = pod1WeekdayName;
-
-      document.getElementById('m_1_name').value = "Moxifloxacin 0.5%";
-      document.getElementById('m_1_cap').value = "Tan Cap";
-      document.getElementById('m_1_mode').value = "1. Discontinue on [date]";
-      document.getElementById('m_1_freq').value = "qid";
-      document.getElementById('m_1_disco').value = cataractMoxiDisco;
-
-      document.getElementById('m_2_name').value = "Ketorolac 0.5%";
-      document.getElementById('m_2_cap').value = "Grey Cap";
-      document.getElementById('m_2_mode').value = "1. Discontinue on [date]";
-      document.getElementById('m_2_freq').value = "qday";
-      document.getElementById('m_2_disco').value = cataractKetoDisco;
-    } 
-    else if (presetChoice === "Glaucoma Drainage Device (GDI)") {
-      document.getElementById('med_card_0').style.display = "block";
-      document.getElementById('med_card_1').style.display = "block";
-      activeVisibleCounterState = 2;
-
-      document.getElementById('m_0_name').value = "Prednisolone Acetate 1%";
-      document.getElementById('m_0_cap').value = "Pink Cap";
-      document.getElementById('m_0_mode').value = "2. taper 1 drop on chosen day";
-      document.getElementById('m_0_freq').value = calculatedStartFreq;
-      document.getElementById('m_0_day').value = pod1WeekdayName;
-
-      document.getElementById('m_1_name').value = "Moxifloxacin 0.5%";
-      document.getElementById('m_1_cap').value = "Tan Cap";
-      document.getElementById('m_1_mode').value = "1. Discontinue on [date]";
-      document.getElementById('m_1_freq').value = "qid";
-      document.getElementById('m_1_disco').value = gdiMoxiDisco;
-    } 
-    else if (presetChoice === "Laser Iridotomy") {
-      document.getElementById('med_card_0').style.display = "block";
-      activeVisibleCounterState = 1;
-
-      document.getElementById('m_0_name').value = "Prednisolone Acetate 1%";
-      document.getElementById('m_0_cap').value = "Pink Cap";
-      document.getElementById('m_0_mode').value = "5. Laser Iridotomy (5d QID, 5d BID, 5d QDAY)";
-      document.getElementById('m_0_freq').value = "qid";
-      document.getElementById('m_0_day').value = pod1WeekdayName;
+    if (preset === "Cataract Surgery") {
+      document.getElementById('med_card_0').style.display = "block"; document.getElementById('med_card_1').style.display = "block"; document.getElementById('med_card_2').style.display = "block"; activeVisibleCounterState = 3;
+      document.getElementById('m_0_name').value = "Prednisolone Acetate 1%"; document.getElementById('m_0_cap').value = "Pink Cap"; document.getElementById('m_0_mode').value = "2. taper 1 drop on chosen day"; document.getElementById('m_0_day').value = pod1DayName;
+      document.getElementById('m_1_name').value = "Moxifloxacin 0.5%"; document.getElementById('m_1_cap').value = "Tan Cap"; document.getElementById('m_1_mode').value = "1. Discontinue on [date]"; document.getElementById('m_1_disco').value = format(new Date(surgDt.getTime() + (6 * 24 * 60 * 60 * 1000)));
+      document.getElementById('m_2_name').value = "Ketorolac 0.5%"; document.getElementById('m_2_cap').value = "Grey Cap"; document.getElementById('m_2_mode').value = "1. Discontinue on [date]"; document.getElementById('m_2_disco').value = format(new Date(surgDt.getTime() + (22 * 24 * 60 * 60 * 1000)));
     }
-
-    for (let i = 0; i < 6; i++) {
-      handleModeUIChange(i);
-    }
-    updatePreviewLive();
+    for(let i=0; i<6; i++) handleModeUIChange(i);
+    calculateCatchUpFrequencies();
   }
 
-  /**
-   * 🔍 WATCHER: Listens to the Regimen Start field to step down dropdown values live on screen
-   * This logic replaces your Python calculate_on_screen_frequencies listener hook.
-   */
   function calculateCatchUpFrequencies() {
-    const presetChoice = document.getElementById('preset_selector').value;
-    const surgeryDateRaw = document.getElementById('p_surg_date').value;
-    const regimenDateRaw = document.getElementById('p_start_date').value;
-    
-    if (!surgeryDateRaw || !regimenDateRaw || presetChoice === "Blank / Custom" || presetChoice === "Laser Iridotomy") {
-      updatePreviewLive();
-      return;
-    }
-
-    const sClean = String(surgeryDateRaw).trim().substring(0, 10);
-    const rClean = String(regimenDateRaw).trim().substring(0, 10);
-    
-    if (sClean.length !== 10 || rClean.length !== 10) {
-      updatePreviewLive();
-      return;
-    }
-
-    const sDt = new Date(sClean + 'T00:00:00');
-    const rDt = new Date(rClean + 'T00:00:00');
-    const pod1Dt = new Date(sDt.getTime() + (24 * 60 * 60 * 1000));
-    const targetDayIdx = pod1Dt.getDay();
-
-    let preTaperEvents = 0;
-    let runner = new Date(pod1Dt.getTime());
-    while (runner <= rDt) {
-      if (runner.getDay() === targetDayIdx && runner.getTime() !== pod1Dt.getTime()) {
-        preTaperEvents++;
-      }
-      runner.setTime(runner.getTime() + (24 * 60 * 60 * 1000));
-    }
-
-    const seq = ["qday", "bid", "tid", "qid"];
-    const calculatedFreq = seq[Math.max(0, 3 - preTaperEvents)];
-    
-    if (presetChoice === "Cataract Surgery" || presetChoice === "Glaucoma Drainage Device (GDI)") {
-      document.getElementById('m_0_freq').value = calculatedFreq;
-    }
+    const preset = document.getElementById('preset_selector').value; const surgStr = document.getElementById('p_surg_date').value; const startStr = document.getElementById('p_start_date').value;
+    if (!surgStr || !startStr || preset === "Blank / Custom") { updatePreviewLive(); return; }
+    let preTaper = 0; let runner = new Date(surgStr + 'T00:00:00'); let targetDay = new Date(runner.getTime() + 24*60*60*1000).getDay();
+    while (runner <= new Date(startStr + 'T00:00:00')) { if (runner.getDay() === targetDay) preTaper++; runner.setTime(runner.getTime() + 24*60*60*1000); }
+    if (preset === "Cataract Surgery") document.getElementById('m_0_freq').value = ["qday", "bid", "tid", "qid"][Math.max(0, 3 - preTaper)];
     updatePreviewLive();
   }
 
-  /**
-   * 🔍 CLIENT-SIDE PDF ENCODER
-   * Replaces Python base64 file downloading pipes natively using local canvas snapshotting.
-   */
   function downloadAsPDFDocument() {
-    const { jsPDF } = window.jspdf;
-    const targetElement = document.getElementById('pdf_print_capture_zone');
-    if (!targetElement) { alert("Please input active surgical dates first!"); return; }
-    
-    html2canvas(targetElement, { scale: 2, useCORS: true }).then(canvas => {
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const { jsPDF } = window.jspdf; const target = document.getElementById('pdf_print_capture_zone');
+    if(!target) { alert("Please input active dates first!"); return; }
+    html2canvas(target, { scale: 2, useCORS: true }).then(canvas => {
       const pdf = new jsPDF('l', 'pt', 'letter');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      pdf.addImage(imgData, 'JPEG', 20, 20, pdfWidth - 40, pdfHeight - 40);
-      const fileName = (document.getElementById('p_name').value || "Patient").replace(/\s+/g, '_');
-      pdf.save(`${fileName}_PostOp_Drop_Schedule.pdf`);
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 20, 20, pdf.internal.pageSize.getWidth() - 40, pdf.internal.pageSize.getHeight() - 40);
+      pdf.save(`${(document.getElementById('p_name').value || "Patient").replace(/\s+/g, '_')}_PostOp_Schedule.pdf`);
     });
   }
+</script>
+</body>
+</html>
+
+
