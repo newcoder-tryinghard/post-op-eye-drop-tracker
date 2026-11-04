@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- 🏥 THIS REPLACES REGISTRATION PACKAGES & ENFORCES STABLE TEXT CHARACTER ENCODING -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ophthalmology Post-Op Drop Chart App</title>
+  
+  <!-- 💾 SECTION 1: SYSTEM LIBRARIES & SYSTEM STYLESHEETS -->
+  <!-- [We will paste Section 1 here] -->
 
-  <!-- 🎨 THIS REPLACES REPORTLAB STYLESHEETS (Enforces clean, high-visibility clinical typography) -->
+  <!-- ============================================================================== -->
+  <!-- 🏥 SECTION 1: SYSTEM LIBRARIES & TYPOGRAPHY STYLESHEET                         -->
+  <!-- ============================================================================== -->
+  <script src="https://cloudflare.com"></script>
+  <script src="https://cloudflare.com"></script>
+
   <style>
     :root { 
       --primary: #1a365d; 
@@ -16,30 +23,65 @@
       --passed: #a0aec0; 
       --stop: #e53e3e; 
     }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-      background: var(--bg); 
-      color: var(--text); 
-      padding: 25px; 
-      margin: 0; 
-    }
-    /* Creates the side-by-side split container layout for input vs live preview sheet */
-    .container { 
-      max-width: 1400px; 
-      margin: 0 auto; 
-      display: grid; 
-      grid-template-columns: 1fr 1fr; 
-      gap: 30px; 
-    }
-    @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } }
-    .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #e2e8f0; }
-  </style>
-</head>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 30px; margin: 0; }
+    .master-wrapper { max-width: 950px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+    h2 { margin-top: 0; color: var(--primary); font-size: 16px; border-bottom: 2px solid #edf2f7; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 13px; color: #4a5568; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: white; color: var(--text); }
+    
+    .btn { background: var(--accent); color: white; border: none; padding: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); transition: background-color 0.2s; margin-top: 5px; }
+    .btn:hover { background: #059669; }
+    .btn-secondary { background-color: #4a5568 !important; color: #ffffff !important; box-shadow: none; }
+    .btn-secondary:hover { background-color: #2d3748 !important; }
+    .btn-blue { background-color: #3b82f6 !important; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2); }
+    .btn-blue:hover { background-color: #2563eb !important; }
 
-<!-- ============================================================================== -->
-<!-- ⚙️ SECTION 2: THE CALENDAR & AUTOMATED CATCH-UP TAPER ENGINE                  -->
-<!-- ============================================================================== -->
-<script>
+    /* Enforces exact Letter Landscape aspect ratio display container bounds down-stacked */
+    .pdf-canvas-wrapper { width: 100%; overflow-x: auto; background: #e2e8f0; padding: 30px 0; display: flex; justify-content: center; border-radius: 12px; border: 1px dashed #cbd5e1; }
+    .sheet-body { background: white; width: 792pt; min-width: 792pt; height: auto; min-height: 612pt; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); padding: 40px; box-sizing: border-box; color: black; position: relative; margin: 0 auto; }
+    
+    .sheet-title { font-size: 20px; font-weight: bold; color: black; margin: 0 0 5px 0; text-align: left; }
+    .sheet-meta { font-size: 13px; color: #2d3748; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+    .week-block { margin-bottom: 25px; page-break-inside: avoid; }
+    .week-header { font-size: 14px; font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+    .grid-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
+    .grid-table th { background: #e2e8f0; color: black; font-weight: bold; font-size: 11px; padding: 10px 4px; text-align: center; border: 0.6px solid #cbd5e1; }
+    .grid-table td { padding: 12px 4px; border: 0.6px solid #cbd5e1; font-size: 11px; text-align: center; vertical-align: middle; overflow: hidden; }
+    
+    .med-details-cell { width: 154px; max-width: 154px; text-align: left !important; font-weight: bold; font-size: 11px !important; }
+    .day-cell { width: 83px; max-width: 83px; }
+    
+    .cap-label { font-size: 9px; color: #4a5568; font-weight: normal; display: block; margin-top: 2px; }
+    .freq-label { font-size: 9px; color: #1a202c; font-style: italic; font-weight: normal; display: block; margin-top: 4px; }
+    
+    .box-grid { display: inline-grid; grid-template-columns: repeat(2, 18px); gap: 7px; justify-content: center; align-content: center; }
+    .chk-box { width: 18px; height: 18px; border: 1.5px solid black; background: white; border-radius: 2px; box-sizing: border-box; }
+    .status-passed { color: var(--passed); font-weight: normal; text-transform: uppercase; font-size: 10px; }
+    .status-stop { color: var(--stop); font-weight: bold; font-size: 10px; text-transform: uppercase; }
+    
+    .reminders-title { font-size: 24px; font-weight: bold; color: var(--primary); margin: 30px 0 15px 0; border-bottom: 2px solid var(--primary); padding-bottom: 5px; }
+    .reminder-item { font-size: 18px; line-height: 28px; margin-bottom: 12px; display: flex; align-items: flex-start; }
+    .reminder-text { flex: 1; }
+    .qr-container { display: flex; align-items: center; gap: 15px; margin-top: 8px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; width: fit-content; }
+    .qr-img { width: 90px; height: 90px; border: 1px solid #cbd5e1; background: white; }
+    .preview-placeholder { border: 2px dashed #cbd5e1; border-radius: 8px; height: 250px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic; background: #fafafa; width: 100%; }
+    
+    @media print {
+      body { background: white; padding: 0; color: black; }
+      .print-hide { display: none !important; }
+      .sheet-body { border: none; box-shadow: none; padding: 0; margin: 0; width: 100%; }
+      .page-break { page-break-before: always; }
+    }
+  </style>
+
+
+
+  // ==============================================================================
+  // ⚙️ SECTION 2: THE CALENDAR & AUTOMATED CATCH-UP TAPER Engine                  
+  // ==============================================================================
+
   /**
    * 🔍 CORE USER INPUT OVERRIDE TAPER MATHEMATICS ENGINE
    * This function replaces your Python compute_daily_schedule loop.
@@ -47,8 +89,8 @@
    */
   function computeDailySchedule(startRegimenDt, baseStartDate, itemDict, surgDt) {
     const mode = itemDict.mode;
-    const taperDay = itemDict.taperDay;
-    const startFreq = itemDict.startFreq;
+    const taperDay = itemDict.day;
+    const startFreq = itemDict.freq;
     const holdWks = parseInt(itemDict.hold) || 1;
     const discoDateStr = itemDict.disco;
     const manualStr = itemDict.manual || "4,3,2,1,0,0,0,0";
@@ -131,7 +173,7 @@
           let tStart = new Date(startRegimenDt.getTime() + (holdWks * 7 * 24 * 60 * 60 * 1000));
           let wCount = 0;
           let checkDt = new Date(tStart.getTime());
-          while (checkDt <= current_dt) {
+          while (checkDt <= currentDt) {
             if (checkDt.getDay() === targetWeekdayIdx && checkDt.getTime() !== tStart.getTime()) wCount++;
             checkDt.setTime(checkDt.getTime() + (24 * 60 * 60 * 1000));
           }
@@ -155,13 +197,12 @@
     }
     return dailyMap;
   }
-</script>
 
 
-<!-- ============================================================================== -->
-<!-- 🖨️ SECTION 3: THE COMPILER & GRID TABLES LAYER (ACCELERATED ENGINE)            -->
-<!-- ============================================================================== -->
-<script>
+  // ==============================================================================
+  // 🖨️ SECTION 3: THE HIGH-CONTRAST CHART GENERATOR & GRID COMPILER              
+  // ==============================================================================
+
   /**
    * Translates numeric drop frequencies into standard clinical instruction text strings.
    */
@@ -183,9 +224,9 @@
     const metaName = patientName.trim() ? patientName.trim() : "____________________";
     const selectedEye = surgeryEye ? surgeryEye : "__________";
     
-    // Builds the master layout card header block
+    // Builds the master layout card header block matching your landscape blueprints
     let htmlMarkup = `
-      <div class="sheet-body">
+      <div class="sheet-body" id="pdf_print_capture_zone">
         <div class="sheet-title">POST-OPERATIVE EYE DROP SCHEDULE</div>
         <div class="sheet-meta">
           <b>Patient Name:</b> ${metaName} &nbsp;&nbsp;|&nbsp;&nbsp; 
@@ -284,7 +325,7 @@
           let testDateStr = new Date(weekStartDate.getTime() + (d * 24 * 60 * 60 * 1000)).toISOString().substring(0,10);
           let fVal = ms.dailyMap[testDateStr] || 0;
           if (fVal > 0 && !weekFrequencies.includes(fVal)) {
-            weekFrequencies.append = weekFrequencies.push(fVal);
+            weekFrequencies.push(fVal);
           }
         }
 
@@ -312,8 +353,10 @@
 
           if (currentDate < startRegimenDt) {
             htmlMarkup += `<td class="status-passed">PASSED</td>`;
+          } else if (ms.modeStr.includes("1. Discontinue") && ms.discoDateStr && currentDate >= new Date(ms.discoDateStr + 'T00:00:00')) {
+            htmlMarkup += `<td class="status-stop">DISCONTINUE</td>`;
           } else if (freqVal > 0) {
-            // Renders the exact requested 18pt checkboxes with 7pt grid separation
+            // Renders the exact requested 18pt checkboxes with 7pt grid separation matrix overlay
             let checkboxBlocks = `<div class="box-grid">`;
             for (let b = 0; b < freqVal; b++) {
               checkboxBlocks += `<div class="chk-box"></div>`;
@@ -321,7 +364,7 @@
             checkboxBlocks += `</div>`;
             htmlMarkup += `<td>${checkboxBlocks}</td>`;
           } else {
-            htmlMarkup += `<td class="status-stop">DISCONTINUE</td>`;
+            htmlMarkup += `<td class="status-passed">Finished</td>`;
           }
         }
         htmlMarkup += `</tr>`;
@@ -333,12 +376,12 @@
     htmlMarkup = appendRemindersLayoutBlock(htmlMarkup, hasLaserIridotomyActive);
     document.getElementById('live_sheet_canvas').innerHTML = htmlMarkup;
   }
-</script>
 
-<!-- ============================================================================== -->
-<!-- 🖨️ SECTION 3.1: THE PATIENT REMINDERS LAYER                                    -->
-<!-- ============================================================================== -->
-<script>
+
+    // ==============================================================================
+  // 🖨️ SECTION 3.1: THE HIGH-VISIBILITY PATIENT REMINDERS BLOCK                  
+  // ==============================================================================
+
   /**
    * Appends the post-operative instructions layout block to the sheet markup.
    * This logic replaces your Python append_reminders_and_build function.
@@ -387,36 +430,87 @@
     outputMarkup += `</div>`;
     return outputMarkup;
   }
-</script>
 
 
-<!-- ============================================================================== -->
-<!-- ⚙️ SECTION 4.0: THE DATA INTERCEPTION & LIVE CANVAS Presentation REFRESHER       -->
-<!-- ============================================================================== -->
-<script>
+    // ==============================================================================
+  // 🖨️ SECTION 3.1: THE HIGH-VISIBILITY PATIENT REMINDERS BLOCK                  
+  // ==============================================================================
+
   /**
-   * Main form compilation engine.
-   * This logic replaces your Python validate_and_compile method.
-   * It intercept inputs live from the form, packages them, and pushes them to your Section 3 compiler.
+   * Appends the post-operative instructions layout block to the sheet markup.
+   * This logic replaces your Python append_reminders_and_build function.
+   * It handles conditional reminder rendering based on active laser iridotomy flags.
+   */
+  function appendRemindersLayoutBlock(currentHtmlContent, hasLaserIridotomyActive) {
+    let outputMarkup = currentHtmlContent;
+    
+    // Forces a physical print page break so instructions stay isolated on a clean sheet
+    outputMarkup += `
+      <div class="page-break"></div>
+      <div class="reminders-title">Reminders:</div>
+    `;
+
+    // Shared video instruction markup text matching your ReportLab parameters
+    const youtubeUrl = "https://youtube.com";
+    const videoInstructionSnippet = `
+      Use the Punctal Occlusion Technique<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;Learn how to do so with this video on YouTube:<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;How to Take Eye Drops - Robert Ritch, MD<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;(Link: <font color="blue"><u>${youtubeUrl}</u></font>)
+      <div class="qr-container">
+        <img class="qr-img" src="https://qrserver.com{encodeURIComponent(youtubeUrl)}" alt="Video QR Link" />
+        <span style="font-size:12px; color:#4a5568; font-weight:normal; margin-left:10px;">Scan to watch drop technique tutorial video</span>
+      </div>
+    `;
+
+    if (hasLaserIridotomyActive) {
+      outputMarkup += `
+        <div class="reminder-item"><div class="reminder-text">1. Wait at least 10 minutes in between drops.</div></div>
+        <div class="reminder-item"><div class="reminder-text">2. ${videoInstructionSnippet}</div></div>
+        <div class="reminder-item"><div class="reminder-text">3. Do not forget to take your other drops if instructed to do so.</div></div>
+        <div class="reminder-item"><div class="reminder-text">4. If you have a decrease in vision, call us at <b>1(212) 979-4120</b> to see an ophthalmologist as soon as possible.</div></div>
+      `;
+    } else {
+      outputMarkup += `
+        <div class="reminder-item"><div class="reminder-text">1. No bending over, no straining, no squatting nor crouching to pick items up off the floor, and no lifting weight more than 5 lbs.</div></div>
+        <div class="reminder-item"><div class="reminder-text">2. Make sure to sleep with the plastic eye shield for 2 weeks.</div></div>
+        <div class="reminder-item"><div class="reminder-text">3. Wait at least 10 minutes in between drops.</div></div>
+        <div class="reminder-item"><div class="reminder-text">4. ${videoInstructionSnippet}</div></div>
+        <div class="reminder-item"><div class="reminder-text">5. Do not forget to take your other drops if instructed to do so.</div></div>
+        <div class="reminder-item"><div class="reminder-text">6. If you have a decrease in vision, call us at <b>1(212) 979-4120</b> to see an ophthalmologist as soon as possible.</div></div>
+      `;
+    }
+
+    outputMarkup += `</div>`;
+    return outputMarkup;
+  }
+
+
+
+    // ==============================================================================
+  // ⚙️ SECTION 4.0: THE DATA INTERCEPTION & LIVE CANVAS REFRESHER                 
+  // ==============================================================================
+
+  /**
+   * Main form compilation coordinator.
+   * This logic replaces your Python validate_and_compile framework handler.
    */
   function updatePreviewLive() {
     const surgeryDateRaw = document.getElementById('p_surg_date').value;
     const regimenDateRaw = document.getElementById('p_start_date').value;
     
-    // 🔍 ERROR VALIDATION ENGINE: Safely halts rendering if core metadata values are blank
+    // Safety Fallback: Stops loop if foundational dates are blank to prevent system lag
     if (!surgeryDateRaw || !regimenDateRaw) return;
 
     const patientName = document.getElementById('p_name').value;
     const surgeryEye = document.getElementById('p_eye').value;
     const totalWeeks = document.getElementById('p_weeks').value || 4;
 
-    // 🔍 DATE PARSING REPAIRED: Strips date strings to exact 10-character formats (YYYY-MM-DD)
     const surgClean = String(surgeryDateRaw).trim().substring(0, 10);
     const regClean = String(regimenDateRaw).trim().substring(0, 10);
 
     let compiledMedsArray = [];
     
-    // Packs medication row arguments into structured dictionary models
     for (let i = 0; i < 6; i++) {
       const cardElement = document.getElementById(`med_card_${i}`);
       if (cardElement && cardElement.style.display !== "none") {
@@ -449,171 +543,14 @@
       compiledMedsArray
     );
   }
-</script>
 
 
 
-<!-- ============================================================================== -->
-<!-- 🚀 SECTION 4.05: THE DYNAMIC FORM LAYOUT DESIGNER                           -->
-<!-- ============================================================================== -->
-<body>
 
-  <div class="print-hide" style="text-align: center; margin-bottom: 25px;">
-    <h1 style="color: var(--primary); margin: 0; font-size: 24px; font-weight: 800;">🏥 Ophthalmology Post-Op Drop Chart Manager</h1>
-    <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Fill out core surgical details first, apply template baselines, and review outputs below.</p>
-  </div>
+  // ==============================================================================
+  // ⚙️ SECTION 4.1: SURGICAL PROTOCOL PRESETS CONNECTOR & CLIENT DOWNLOADS       
+  // ==============================================================================
 
-  <div class="container">
-    <!-- Left Workspace Input Panel Card -->
-    <div class="column print-hide">
-      <div class="card">
-        <h2>👤 Patient & Surgery Metadata</h2>
-        <div class="form-group">
-          <label>Patient Name</label>
-          <input type="text" id="p_name" placeholder="Enter patient name..." oninput="updatePreviewLive()">
-        </div>
-        <div class="form-group">
-          <label>Surgery Eye</label>
-          <select id="p_eye" onchange="updatePreviewLive()">
-            <option value="Right Eye (OD)">Right Eye (OD)</option>
-            <option value="Left Eye (OS)">Left Eye (OS)</option>
-            <option value="Both Eyes (OU)">Both Eyes (OU)</option>
-          </select>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-          <div class="form-group">
-            <label>Surgery Date</label>
-            <input type="date" id="p_surg_date" onchange="applySurgicalPreset()">
-          </div>
-          <div class="form-group">
-            <label>Regimen/Visit Start Date</label>
-            <input type="date" id="p_start_date" onchange="updatePreviewLive()">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Total Tracking Weeks</label>
-          <input type="number" id="p_weeks" min="1" max="12" value="4" oninput="updatePreviewLive()">
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>📋 Quick-Load Surgical Protocol Presets</h2>
-        <div class="form-group">
-          <label>Choose Template Protocol</label>
-          <select id="preset_selector" onchange="applySurgicalPreset()">
-            <option value="Blank / Custom" selected>Blank / Custom</option>
-            <option value="Cataract Surgery">Cataract Surgery</option>
-            <option value="Glaucoma Drainage Device (GDI)">Glaucoma Drainage Device (GDI)</option>
-            <option value="Laser Iridotomy">Laser Iridotomy</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Loops out the 6 matching adjustable medication accordion rows structurally -->
-      <div id="med_inputs_container">
-        <script>
-          (function() {
-            let containerMarkup = "";
-            const modesList = [
-              "0. Manual Comma String", "1. Discontinue on [date]", "2. taper 1 drop on chosen day", 
-              "3. *day for X week(s) and then taper 1 drop on chosen day", 
-              "4. *day for X week(s), then taper 1 drop on chosen day, and then continue qod",
-              "5. Laser Iridotomy (5d QID, 5d BID, 5d QDAY)"
-            ];
-            const freqList = ["qday", "bid", "tid", "qid", "qod", "q4h", "q2h"];
-            const daysList = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            
-            for (let i = 0; i < 6; i++) {
-              containerMarkup += `
-                <div class="card" id="med_card_${i}" style="display: ${i === 0 ? 'block' : 'none'}; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 15px;">
-                  <h3 style="margin-top:0; font-size:14px; color:var(--primary);">💧 Medication #${i + 1} Settings ${i === 0 ? '(Mandatory)' : ''}</h3>
-                  <div class="form-group">
-                    <label>Medication Name</label>
-                    <input type="text" id="m_${i}_name" placeholder="Enter med name..." oninput="updatePreviewLive()">
-                  </div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                    <div class="form-group"><label>Cap Color</label><input type="text" id="m_${i}_cap" placeholder="Enter cap color..." oninput="updatePreviewLive()"></div>
-                    <div class="form-group">
-                      <label>Taper Mode Selector</label>
-                      <select id="m_${i}_mode" onchange="handleModeUIChange(${i}); updatePreviewLive();">
-                        ${modesList.map(m => `<option value="${m}" ${m === "1. Discontinue on [date]" ? 'selected' : ''}>${m}</option>`).join('')}
-                      </select>
-                    </div>
-                  </div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                    <div class="form-group">
-                      <label>Starting Drop Frequency</label>
-                      <select id="m_${i}_freq" onchange="updatePreviewLive()">
-                        ${freqList.map(f => `<option value="${f}" ${f === 'qid' ? 'selected' : ''}>${f}</option>`).join('')}
-                      </select>
-                    </div>
-                    <div class="form-group" id="m_${i}_day_group"><label>Taper Weekday</label>
-                      <select id="m_${i}_day" onchange="updatePreviewLive()">
-                        ${daysList.map(d => `<option value="${d}" ${d === 'Friday' ? 'selected' : ''}>${d}</option>`).join('')}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="form-group" id="m_${i}_disco_group" style="display:none;"><label>Select Discontinue Date</label><input type="date" id="m_${i}_disco" onchange="updatePreviewLive()"></div>
-                  <div class="form-group" id="m_${i}_hold_group" style="display:none;"><label>Hold Initial Frequency Flat (Weeks)</label><input type="number" id="m_${i}_hold" value="1" min="1" oninput="updatePreviewLive()"></div>
-                  <div class="form-group" id="m_${i}_manual_group" style="display:none;"><label>Enter Manual Comma List</label><input type="text" id="m_${i}_manual" value="4,3,2,1,0,0,0,0,0,0,0,0" oninput="updatePreviewLive()"></div>
-                </div>
-              `;
-            }
-            document.write(containerMarkup);
-          })();
-
-          // Manages internal structural input box toggles right on your screen natively
-          function handleModeUIChange(i) {
-            const mode = document.getElementById(`m_${i}_mode`).value;
-            document.getElementById(`m_${i}_disco_group`).style.display = mode.includes("1.") ? "block" : "none";
-            document.getElementById(`m_${i}_day_group`).style.display = (mode.includes("2.") || mode.includes("3.") || mode.includes("4.")) ? "block" : "none";
-            document.getElementById(`m_${i}_hold_group`).style.display = (mode.includes("3.") || mode.includes("4.")) ? "block" : "none";
-            document.getElementById(`m_${i}_manual_group`).style.display = mode.includes("0. Manual") ? "block" : "none";
-          }
-        </script>
-      </div>
-      
-      <!-- Operational Row Append buttons loops control -->
-      <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 15px;">
-        <button class="btn" style="background-color: #4a5568 !important;" id="add_row_btn_trigger">➕ Add Another Medication</button>
-      </div>
-    </div>
-
-    <!-- Right Presentation Canvas Panel Layout -->
-    <div class="column">
-      <div class="card" style="position: sticky; top: 20px; background: #fafafa; max-height: 90vh; overflow-y: auto;">
-        <h2 class="print-hide">📄 Live Post-Op PDF Preview Canvas</h2>
-        <div id="live_sheet_canvas">
-          <div class="preview-placeholder print-hide">Your interactive chart preview layout pages will render here instantly...</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Handles the visible accordion tracking state adjustments on button taps
-    let activeVisibleCounterState = 1;
-    document.getElementById('add_row_btn_trigger').addEventListener('click', function() {
-      if (activeVisibleCounterState < 6) {
-        document.getElementById(`med_card_${activeVisibleCounterState}`).style.display = "block";
-        activeVisibleCounterState++;
-        if (activeVisibleCounterState === 6) {
-          this.style.display = "none";
-        }
-        updatePreviewLive();
-      }
-    });
-    
-    // Set default regimen/visit date picker element initialization value on load
-    document.getElementById('p_start_date').value = new Date().toISOString().substring(0,10);
-  </script>
-
-
-
-<!-- ============================================================================== -->
-<!-- 🚀 SECTION 4.1: SURGICAL PROTOCOL PRESETS CONNECTOR & TRIPPLE-BIND CORES         -->
-<!-- ============================================================================== -->
-<script>
   /**
    * Automates form value assignments based on chosen surgical protocols.
    * This logic replaces your Python apply_surgery_preset framework method.
@@ -628,21 +565,16 @@
     const regDateStr = (regimenDateRaw && regimenDateRaw.trim().length >= 10) ? regimenDateRaw.trim().substring(0, 10) : todayStr;
 
     let baseDt = new Date(baseDateStr + 'T00:00:00');
-    if (isNaN(baseDt.getTime())) {
-      baseDt = new Date();
-    }
+    if (isNaN(baseDt.getTime())) baseDt = new Date();
     let regDt = new Date(regDateStr + 'T00:00:00');
-    if (isNaN(regDt.getTime())) {
-      regDt = new Date();
-    }
+    if (isNaN(regDt.getTime())) regDt = new Date();
 
-    // 🔍 AUTOMATIC WEEKDAY DISCOVERY: Configures taper weekday values to match POD #1 automatically
+    // AUTOMATIC WEEKDAY DISCOVERY: Configures taper weekday values to match POD #1 automatically
     const pod1Dt = new Date(baseDt.getTime() + (24 * 60 * 60 * 1000));
     const fullWeekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const pod1WeekdayName = fullWeekdays[pod1Dt.getDay()];
     const targetWeekdayIdx = pod1Dt.getDay();
 
-    // Runs your identical background elapsed week counter path calculation loop
     let preTaperEvents = 0;
     let checkRunDt = new Date(pod1Dt.getTime());
     while (checkRunDt <= regDt) {
@@ -655,7 +587,6 @@
     const freqSequence = ["qday", "bid", "tid", "qid"];
     const calculatedStartFreq = freqSequence[Math.max(0, 3 - preTaperEvents)];
 
-    // Generates precise relative date offsets out from your chosen surgery day
     const formatOffset = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     const cataractMoxiDisco = formatOffset(new Date(baseDt.getTime() + (6 * 24 * 60 * 60 * 1000)));
     const cataractKetoDisco = formatOffset(new Date(baseDt.getTime() + (22 * 24 * 60 * 60 * 1000)));
@@ -674,21 +605,18 @@
       document.getElementById('med_card_2').style.display = "block";
       activeVisibleCounterState = 3;
 
-      // Med 1: Prednisolone Tapering
       document.getElementById('m_0_name').value = "Prednisolone Acetate 1%";
       document.getElementById('m_0_cap').value = "Pink Cap";
       document.getElementById('m_0_mode').value = "2. taper 1 drop on chosen day";
       document.getElementById('m_0_freq').value = calculatedStartFreq;
       document.getElementById('m_0_day').value = pod1WeekdayName;
 
-      // Med 2: Moxifloxacin 5-Day D/C
       document.getElementById('m_1_name').value = "Moxifloxacin 0.5%";
       document.getElementById('m_1_cap').value = "Tan Cap";
       document.getElementById('m_1_mode').value = "1. Discontinue on [date]";
       document.getElementById('m_1_freq').value = "qid";
       document.getElementById('m_1_disco').value = cataractMoxiDisco;
 
-      // Med 3: Ketorolac 3-Week D/C
       document.getElementById('m_2_name').value = "Ketorolac 0.5%";
       document.getElementById('m_2_cap').value = "Grey Cap";
       document.getElementById('m_2_mode').value = "1. Discontinue on [date]";
@@ -723,7 +651,6 @@
       document.getElementById('m_0_day').value = pod1WeekdayName;
     }
 
-    // Forces visibility configurations to display secondary sub-inputs instantly
     for (let i = 0; i < 6; i++) {
       handleModeUIChange(i);
     }
@@ -769,15 +696,29 @@
     const seq = ["qday", "bid", "tid", "qid"];
     const calculatedFreq = seq[Math.max(0, 3 - preTaperEvents)];
     
-    // Updates dropdown item values right on screen instantly
     if (presetChoice === "Cataract Surgery" || presetChoice === "Glaucoma Drainage Device (GDI)") {
       document.getElementById('m_0_freq').value = calculatedFreq;
     }
     updatePreviewLive();
   }
-</script>
-</body>
-</html>
 
-
-
+  /**
+   * 🔍 CLIENT-SIDE PDF ENCODER
+   * Replaces Python base64 file downloading pipes natively using local canvas snapshotting.
+   */
+  function downloadAsPDFDocument() {
+    const { jsPDF } = window.jspdf;
+    const targetElement = document.getElementById('pdf_print_capture_zone');
+    if (!targetElement) { alert("Please input active surgical dates first!"); return; }
+    
+    html2canvas(targetElement, { scale: 2, useCORS: true }).then(canvas => {
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF('l', 'pt', 'letter');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      pdf.addImage(imgData, 'JPEG', 20, 20, pdfWidth - 40, pdfHeight - 40);
+      const fileName = (document.getElementById('p_name').value || "Patient").replace(/\s+/g, '_');
+      pdf.save(`${fileName}_PostOp_Drop_Schedule.pdf`);
+    });
+  }
